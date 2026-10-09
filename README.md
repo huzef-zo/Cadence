@@ -41,3 +41,13 @@ npm test         # run the unit tests (Vitest)
 npm run lint     # type-check
 npm run build    # production build (outputs dist/)
 npm run preview  # preview the production build
+```
+
+## How to contribute
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code style, commit standards, and instructions regarding clinical thresholds in `src/logic/config.ts`.
+
+## Known limitations
+
+- **App lock:** The PIN lock only hides the interface and does not encrypt the data stored in IndexedDB.
+- **Reminders:** Local notifications only fire while the app is open.
