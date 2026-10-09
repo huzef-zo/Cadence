@@ -1,5 +1,34 @@
 import { liveQuery } from 'dexie';
 import { useEffect, useState } from 'react';
+import { today } from '../logic/dates';
+
+// Returns current day string (YYYY-MM-DD). Updates when visibility changes or every 60s.
+export function useToday(): string {
+  const [currentDay, setCurrentDay] = useState(() => today());
+
+  useEffect(() => {
+    function checkAndSet() {
+      const fresh = today();
+      setCurrentDay((prev) => (prev !== fresh ? fresh : prev));
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        checkAndSet();
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const intervalId = setInterval(checkAndSet, 60_000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  return currentDay;
+}
 
 // Subscribes to a Dexie liveQuery (dexie core, no extra package) and
 // re-renders when the underlying tables change.
