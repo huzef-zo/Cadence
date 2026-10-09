@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Cadence">
+  <!-- Discreet abstract mark: an arc over a baseline. No explicit imagery. -->
+  <rect width="512" height="512" rx="96" fill="#6b5b7a"/>
+  <path d="M116 300a140 140 0 0 1 280 0" fill="none" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+  <line x1="116" y1="384" x2="396" y2="384" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+</svg>
