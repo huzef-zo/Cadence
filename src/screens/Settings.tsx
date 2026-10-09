@@ -37,13 +37,8 @@ export function Settings() {
   const notificationsSupported = typeof Notification !== 'undefined';
   const permission = notificationsSupported ? Notification.permission : 'denied';
 
-  async function patchSettings(patch: Partial<SettingsData>) {
-    await saveSettings({ ...settings, ...patch });
-  }
-
-  async function patchReminders(patch: Partial<SettingsData['reminders']>) {
-    await patchSettings({ reminders: { ...settings.reminders, ...patch } });
-  }
+    async function patchSettings(patch: Partial<SettingsData>) { ... }
+  async function patchReminders(patch: Partial<SettingsData['reminders']>) { ... }
 
   async function requestPermissionIfNeeded(): Promise<boolean> {
     if (!notificationsSupported) return false;
