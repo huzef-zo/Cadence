@@ -188,6 +188,36 @@ export const strings = {
   // PWA update prompt
   updateAvailable: 'Update available',
   updateReload: 'Reload to update',
+    // Mood values
+  moodVeryLow: 'Very low',
+  moodLow: 'Low',
+  moodNeutral: 'Neutral',
+  moodGood: 'Good',
+  moodGreat: 'Great',
+
+  // Mood tags
+  tagCalm: 'Calm',
+  tagAnxious: 'Anxious',
+  tagIrritable: 'Irritable',
+  tagSad: 'Sad',
+  tagEnergetic: 'Energetic',
+  tagTired: 'Tired',
+
+  // Pain location tags
+  painTagCramps: 'Cramps',
+  painTagLowerBack: 'Lower back',
+  painTagHeadache: 'Headache',
+  painTagBreastTenderness: 'Breast tenderness',
+  painTagOther: 'Other',
+
+  // Symptoms
+  symptomBloating: 'Bloating',
+  symptomAcne: 'Acne',
+  symptomNausea: 'Nausea',
+  symptomCravings: 'Cravings',
+  symptomPoorSleep: 'Poor sleep',
+  symptomLowEnergy: 'Low energy',
+  symptomDizziness: 'Dizziness',
 };
 
 export const flowLabels: Record<'none' | 'spotting' | 'light' | 'medium' | 'heavy', string> = {
