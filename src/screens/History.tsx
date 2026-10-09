@@ -1,11 +1,14 @@
-import { strings } from '../i18n/en';
+import { useState } from 'react';
+import { CycleCard } from '../components/CycleCard';
+import { InsightsView } from '../components/InsightsView';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
-import { CycleCard } from '../components/CycleCard';
+import { strings } from '../i18n/en';
 import { deriveCycles } from '../logic/cycles';
 import { mean } from '../logic/stats';
 
 export function History() {
+  const [activeTab, setActiveTab] = useState<'cycles' | 'insights'>('cycles');
   const periods = useLiveQuery(() => db.periods.toArray(), []);
   const entries = useLiveQuery(() => db.entries.toArray(), []);
 
@@ -29,28 +32,51 @@ export function History() {
     <main className="screen">
       <h1 className="screen__title">{strings.tabHistory}</h1>
 
-      {cycles.length === 0 ? (
-        <p>{strings.noCycles}</p>
+      <div className="segmented-control" role="group">
+        <button
+          type="button"
+          className={`segmented-control__btn ${activeTab === 'cycles' ? 'segmented-control__btn--selected' : ''}`}
+          aria-pressed={activeTab === 'cycles'}
+          onClick={() => setActiveTab('cycles')}
+        >
+          {strings.segmentCycles}
+        </button>
+        <button
+          type="button"
+          className={`segmented-control__btn ${activeTab === 'insights' ? 'segmented-control__btn--selected' : ''}`}
+          aria-pressed={activeTab === 'insights'}
+          onClick={() => setActiveTab('insights')}
+        >
+          {strings.segmentInsights}
+        </button>
+      </div>
+
+      {activeTab === 'cycles' ? (
+        cycles.length === 0 ? (
+          <p>{strings.noCycles}</p>
+        ) : (
+          <>
+            <div className="summary">
+              <div className="summary__item">
+                <p className="summary__value">{averageCycle !== null ? strings.days(averageCycle) : strings.notAvailable}</p>
+                <p className="summary__label">{strings.summaryAvgCycleLength}</p>
+              </div>
+              <div className="summary__item">
+                <p className="summary__value">{averagePeriod !== null ? strings.days(averagePeriod) : strings.notAvailable}</p>
+                <p className="summary__label">{strings.summaryAvgPeriodLength}</p>
+              </div>
+              <div className="summary__item">
+                <p className="summary__value">{cycles.length}</p>
+                <p className="summary__label">{strings.summaryCyclesLogged}</p>
+              </div>
+            </div>
+            {cycles.map((cycle) => (
+              <CycleCard key={cycle.startDate} cycle={cycle} entries={entries} />
+            ))}
+          </>
+        )
       ) : (
-        <>
-          <div className="summary">
-            <div className="summary__item">
-              <p className="summary__value">{averageCycle !== null ? strings.days(averageCycle) : strings.notAvailable}</p>
-              <p className="summary__label">{strings.summaryAvgCycleLength}</p>
-            </div>
-            <div className="summary__item">
-              <p className="summary__value">{averagePeriod !== null ? strings.days(averagePeriod) : strings.notAvailable}</p>
-              <p className="summary__label">{strings.summaryAvgPeriodLength}</p>
-            </div>
-            <div className="summary__item">
-              <p className="summary__value">{cycles.length}</p>
-              <p className="summary__label">{strings.summaryCyclesLogged}</p>
-            </div>
-          </div>
-          {cycles.map((cycle) => (
-            <CycleCard key={cycle.startDate} cycle={cycle} entries={entries} />
-          ))}
-        </>
+        <InsightsView cycles={cycles} entries={entries} />
       )}
     </main>
   );
