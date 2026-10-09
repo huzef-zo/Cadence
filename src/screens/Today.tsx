@@ -84,10 +84,10 @@ export function Today() {
     await updatePeriod({ ...ongoing, endDate: day });
   }
 
-  async function handleExportReminder() {
+    const handleExportReminder = async () => {
     await exportBackup(db);
     await saveSettings({ ...settings, lastExportReminderAt: day });
-  }
+  };
 
   return (
     <main className="screen">
