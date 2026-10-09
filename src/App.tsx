@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { db } from './db/db';
 import { getSettings } from './db/queries';
 import { useLiveQuery } from './db/hooks';
 import { LockScreen } from './components/LockScreen';
