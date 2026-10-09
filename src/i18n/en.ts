@@ -10,6 +10,32 @@ export const strings = {
   tabHistory: 'History',
   tabSettings: 'Settings',
 
+  // History Segmented Control
+  segmentCycles: 'Cycles',
+  segmentInsights: 'Insights',
+
+  // Insights
+  insightsSummary: (avg: number, min: number, max: number, count: number) =>
+    `Average cycle length: ${avg} days (range ${min}–${max}) across ${count} cycles.`,
+  insightsKeepLogging: 'Keep logging to see this.',
+  insightsHeadingCycleLengthTrend: 'Cycle length trend',
+  insightsHeadingPeriodLengthTrend: 'Period length trend',
+  insightsHeadingPainAcrossCycle: 'Pain across the cycle',
+  insightsHeadingMoodAcrossCycle: 'Mood across the cycle',
+  insightsHeadingTopSymptoms: 'Top symptoms',
+  insightsHeadingFlowDistribution: 'Flow distribution',
+  insightsDisclaimer: 'These charts only describe what you have logged. They are not a medical assessment.',
+
+  // Charts & Tables
+  showDataTable: 'Show data table',
+  tableHeaderLabel: 'Label',
+  tableHeaderValue: 'Value',
+  tableHeaderCount: 'Count',
+  lineChartAriaLabel: (title: string, count: number, first: string | number, last: string | number) =>
+    `${title} chart with ${count} data points. First value is ${first}, last value is ${last}.`,
+  barListAriaLabel: (title: string, count: number) =>
+    `${title} horizontal bar list with ${count} items.`,
+
   // Generic
   save: 'Save',
   cancel: 'Cancel',
@@ -189,7 +215,7 @@ export const strings = {
   // PWA update prompt
   updateAvailable: 'Update available',
   updateReload: 'Reload to update',
-    // Mood values
+  // Mood values
   moodVeryLow: 'Very low',
   moodLow: 'Low',
   moodNeutral: 'Neutral',
