@@ -65,8 +65,12 @@ export function downloadText(filename: string, text: string, type = 'application
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = filename;
+  document.body.appendChild(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(anchor);
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
 }
 
 export function backupFilename(now = new Date()): string {

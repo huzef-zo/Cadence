@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CadenceDB, DEFAULT_SETTINGS } from './db';
 import { applyBackup, buildBackup, validateBackup } from './backup';
 import type { DayEntry, Period } from './types';
@@ -50,5 +50,53 @@ describe('backup round trip (7.5)', () => {
     expect(validateBackup({ app: 'other' })).toBeNull();
     expect(validateBackup({ app: 'cadence', schemaVersion: 99, periods: [], entries: [], settings: {} })).toBeNull();
     expect(validateBackup({ app: 'cadence', schemaVersion: 1, periods: 'x', entries: [], settings: {} })).toBeNull();
+  });
+});
+
+describe('downloadText', () => {
+  it('appends anchor to body, clicks it, removes it, and delays revoking object URL', async () => {
+    const { downloadText } = await import('./backup');
+
+    const createObjectURLMock = vi.fn().mockReturnValue('blob:test-url');
+    const revokeObjectURLMock = vi.fn();
+    globalThis.URL.createObjectURL = createObjectURLMock;
+    globalThis.URL.revokeObjectURL = revokeObjectURLMock;
+
+    vi.useFakeTimers();
+
+    const appendChildSpy = vi.fn();
+    const removeChildSpy = vi.fn();
+    const clickSpy = vi.fn();
+    const createdAnchor = { href: '', download: '', click: clickSpy };
+
+    const mockDocument = {
+      body: {
+        appendChild: appendChildSpy,
+        removeChild: removeChildSpy,
+      },
+      createElement: vi.fn().mockReturnValue(createdAnchor),
+    };
+
+    const origDocument = globalThis.document;
+    // @ts-expect-error mocking minimal document for node test environment
+    globalThis.document = mockDocument;
+
+    try {
+      downloadText('test.json', '{"test":true}');
+
+      expect(mockDocument.createElement).toHaveBeenCalledWith('a');
+      expect(createdAnchor.download).toBe('test.json');
+      expect(appendChildSpy).toHaveBeenCalledWith(createdAnchor);
+      expect(clickSpy).toHaveBeenCalled();
+      expect(removeChildSpy).toHaveBeenCalledWith(createdAnchor);
+      expect(revokeObjectURLMock).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1000);
+      expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:test-url');
+    } finally {
+      globalThis.document = origDocument;
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
   });
 });
