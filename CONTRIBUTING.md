@@ -1,6 +1,3 @@
-
-**`CONTRIBUTING.md`**
-```md
 # Contributing
 
 Thank you for helping with Cadence!
