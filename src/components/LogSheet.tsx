@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react';
-import { moodTagKeys, painTagKeys, strings, symptomKeys, tagLabels } from '../i18n/en';
+import { useI18n } from '../i18n';
+import { moodTagKeys, painTagKeys, symptomKeys } from '../i18n/keys';
 import { Sheet } from './Sheet';
 import { MoodPicker } from './MoodPicker';
 import { PainSlider } from './PainSlider';
 import { getEntry, saveEntry } from '../db/queries';
 import type { Flow } from '../db/types';
 import { NOTE_MAX_LENGTH } from '../logic/config';
-import { formatDayLong } from '../logic/dates';
-
-const FLOW_OPTIONS: { value: Flow | null; label: string }[] = [
-  { value: null, label: strings.fieldNotSet },
-  { value: 'none', label: strings.flowNone },
-  { value: 'spotting', label: strings.flowSpotting },
-  { value: 'light', label: strings.flowLight },
-  { value: 'medium', label: strings.flowMedium },
-  { value: 'heavy', label: strings.flowHeavy },
-];
 
 interface LogSheetProps {
   date: string; // YYYY-MM-DD
@@ -23,6 +14,7 @@ interface LogSheetProps {
 }
 
 export function LogSheet({ date, onClose }: LogSheetProps) {
+  const { t, formatDay } = useI18n();
   const [flow, setFlow] = useState<Flow | null>(null);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [moodTags, setMoodTags] = useState<string[]>([]);
@@ -31,6 +23,15 @@ export function LogSheet({ date, onClose }: LogSheetProps) {
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [loaded, setLoaded] = useState(false);
+
+  const flowOptions: { value: Flow | null; label: string }[] = [
+    { value: null, label: t.fieldNotSet },
+    { value: 'none', label: t.flowNone },
+    { value: 'spotting', label: t.flowSpotting },
+    { value: 'light', label: t.flowLight },
+    { value: 'medium', label: t.flowMedium },
+    { value: 'heavy', label: t.flowHeavy },
+  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -70,13 +71,13 @@ export function LogSheet({ date, onClose }: LogSheetProps) {
   }
 
   return (
-    <Sheet title={strings.logTitle(formatDayLong(date))} onClose={onClose}>
+    <Sheet title={t.logTitle(formatDay(date))} onClose={onClose}>
       {loaded && (
         <div className="form-grid">
           <fieldset className="field">
-            <legend className="field__label">{strings.logFlow}</legend>
+            <legend className="field__label">{t.logFlow}</legend>
             <div className="chip-group">
-              {FLOW_OPTIONS.map((option) => (
+              {flowOptions.map((option) => (
                 <label key={option.label} className={`chip${flow === option.value ? ' chip--on' : ''}`}>
                   <input
                     type="radio"
@@ -94,7 +95,7 @@ export function LogSheet({ date, onClose }: LogSheetProps) {
           <MoodPicker value={mood} onChange={setMood} />
 
           <TagGroup
-            label={strings.moodTagsLabel}
+            label={t.moodTagsLabel}
             options={moodTagKeys}
             selected={moodTags}
             onToggle={(tag) => toggle(moodTags, setMoodTags, tag)}
@@ -103,34 +104,34 @@ export function LogSheet({ date, onClose }: LogSheetProps) {
           <PainSlider value={pain} onChange={setPain} />
 
           <TagGroup
-            label={strings.painTagsLabel}
+            label={t.painTagsLabel}
             options={painTagKeys}
             selected={painTags}
             onToggle={(tag) => toggle(painTags, setPainTags, tag)}
           />
 
           <TagGroup
-            label={strings.symptomsLabel}
+            label={t.symptomsLabel}
             options={symptomKeys}
             selected={symptoms}
             onToggle={(tag) => toggle(symptoms, setSymptoms, tag)}
           />
 
           <div className="field">
-            <label className="field__label" htmlFor="log-note">{strings.logNote}</label>
+            <label className="field__label" htmlFor="log-note">{t.logNote}</label>
             <textarea
               id="log-note"
               className="input"
               maxLength={NOTE_MAX_LENGTH}
               value={note}
-              placeholder={strings.logNotePlaceholder}
+              placeholder={t.logNotePlaceholder}
               onChange={(event) => setNote(event.target.value.slice(0, NOTE_MAX_LENGTH))}
             />
-            <p className="field__hint">{strings.noteRemaining(NOTE_MAX_LENGTH - note.length)}</p>
+            <p className="field__hint">{t.noteRemaining(NOTE_MAX_LENGTH - note.length)}</p>
           </div>
 
           <button type="button" className="btn btn--primary" onClick={handleSave}>
-            {strings.save}
+            {t.save}
           </button>
         </div>
       )}
@@ -146,6 +147,7 @@ interface TagGroupProps {
 }
 
 function TagGroup({ label, options, selected, onToggle }: TagGroupProps) {
+  const { t } = useI18n();
   return (
     <fieldset className="field">
       <legend className="field__label">{label}</legend>
@@ -158,10 +160,10 @@ function TagGroup({ label, options, selected, onToggle }: TagGroupProps) {
               checked={selected.includes(tag)}
               onChange={() => onToggle(tag)}
             />
-            {tagLabels[tag] ?? tag}
+            {t.tagLabels[tag] ?? tag}
           </label>
         ))}
       </div>
     </fieldset>
   );
-      }
+}

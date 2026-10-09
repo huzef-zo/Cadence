@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { moodLabels, strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { entrySummaryLines } from './EntrySummary';
 import type { Cycle } from '../logic/types';
 import { singleCycleLabel, singleCycleNote } from '../logic/regularity';
 import { mean, mostFrequent } from '../logic/stats';
-import { addDaysToDay, formatDayLong, today } from '../logic/dates';
+import { addDaysToDay, today } from '../logic/dates';
 import type { DayEntry } from '../db/types';
 
 interface CycleCardProps {
@@ -13,6 +13,7 @@ interface CycleCardProps {
 }
 
 export function CycleCard({ cycle, entries }: CycleCardProps) {
+  const { t, formatDay } = useI18n();
   const [open, setOpen] = useState(false);
 
   const cycleEnd = cycle.cycleLength !== null ? addDaysToDay(cycle.startDate, cycle.cycleLength - 1) : today();
@@ -32,36 +33,36 @@ export function CycleCard({ cycle, entries }: CycleCardProps) {
     <article className="card">
       <button type="button" className="card__toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
         <span className="card__title">
-          {formatDayLong(cycle.startDate)} –{' '}
-          {cycle.periodEndDate !== null ? formatDayLong(cycle.periodEndDate) : strings.periodOngoing}
+          {formatDay(cycle.startDate)} –{' '}
+          {cycle.periodEndDate !== null ? formatDay(cycle.periodEndDate) : t.periodOngoing}
         </span>
         <span className="card__meta">
-          {strings.cardPeriodLength}:{' '}
-          {cycle.periodLength !== null ? strings.days(cycle.periodLength) : strings.notAvailable}
+          {t.cardPeriodLength}:{' '}
+          {cycle.periodLength !== null ? t.days(cycle.periodLength) : t.notAvailable}
           {' · '}
-          {strings.cardCycleLength}:{' '}
-          {cycle.cycleLength !== null ? strings.days(cycle.cycleLength) : strings.periodOngoing}
+          {t.cardCycleLength}:{' '}
+          {cycle.cycleLength !== null ? t.days(cycle.cycleLength) : t.periodOngoing}
         </span>
         {label !== null && (
           <span className={`badge ${label === 'within-typical-range' ? 'badge--ok' : 'badge--warn'}`}>
-            {label === 'within-typical-range' ? strings.cycleWithinRange : strings.cycleOutsideRange}
+            {label === 'within-typical-range' ? t.cycleWithinRange : t.cycleOutsideRange}
           </span>
         )}
-        {note !== null && <span className="card__note">{note === 'short' ? strings.noteShort : strings.noteLong}</span>}
+        {note !== null && <span className="card__note">{note === 'short' ? t.noteShort : t.noteLong}</span>}
         <span className="card__meta">
-          {strings.cardAvgPain}: {averagePain !== null ? averagePain : strings.notAvailable}
+          {t.cardAvgPain}: {averagePain !== null ? averagePain : t.notAvailable}
           {' · '}
-          {strings.cardMoodFrequency}: {frequentMood !== null ? moodLabels[frequentMood] : strings.notAvailable}
+          {t.cardMoodFrequency}: {frequentMood !== null ? t.moodLabels[frequentMood] : t.notAvailable}
         </span>
       </button>
       {open && (
         <ul className="entry-list">
           {cycleEntries.length === 0 ? (
-            <li className="card__note">{strings.noEntries}</li>
+            <li className="card__note">{t.noEntries}</li>
           ) : (
             cycleEntries.map((entry) => (
               <li key={entry.date}>
-                <strong>{formatDayLong(entry.date)}</strong> — {entrySummaryLines(entry).join(' · ')}
+                <strong>{formatDay(entry.date)}</strong> — {entrySummaryLines(entry, t).join(' · ')}
               </li>
             ))
           )}

@@ -9,7 +9,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery, useToday } from '../db/hooks';
 import { DayCell, type DayInfo } from '../components/DayCell';
@@ -32,6 +32,7 @@ function periodDaysFrom(periods: Period[], todayString: string): Set<string> {
 }
 
 export function Calendar() {
+  const { t, formatMonth, weekdayShort } = useI18n();
   const todayString = useToday();
   const [month, setMonth] = useState(() => startOfMonth(new Date()));
   const [selected, setSelected] = useState<string | null>(null);
@@ -73,32 +74,32 @@ export function Calendar() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{strings.tabCalendar}</h1>
+      <h1 className="screen__title">{t.tabCalendar}</h1>
 
       <div className="calendar-nav">
         <button
           type="button"
           className="btn btn--ghost"
-          aria-label={strings.calendarPrevMonth}
+          aria-label={t.calendarPrevMonth}
           onClick={() => setMonth(addMonths(month, -1))}
         >
           ‹
         </button>
         <h2 className="calendar-month" aria-live="polite">
-          {format(month, 'MMMM yyyy')}
+          {formatMonth(month)}
         </h2>
         <button
           type="button"
           className="btn btn--ghost"
-          aria-label={strings.calendarNextMonth}
+          aria-label={t.calendarNextMonth}
           onClick={() => setMonth(addMonths(month, 1))}
         >
           ›
         </button>
       </div>
 
-      <div className="calendar-grid" role="group" aria-label={format(month, 'MMMM yyyy')}>
-        {strings.weekdayShort.map((weekday) => (
+      <div className="calendar-grid" role="group" aria-label={formatMonth(month)}>
+        {weekdayShort.map((weekday) => (
           <span key={weekday} className="calendar-weekday">
             {weekday}
           </span>
@@ -109,10 +110,10 @@ export function Calendar() {
       </div>
 
       <ul className="legend">
-        <li className="legend__item"><span className="legend__marker legend__marker--period" aria-hidden="true" /> {strings.legendPeriod}</li>
-        <li className="legend__item"><span className="legend__marker legend__marker--predicted" aria-hidden="true" /> {strings.legendPredicted}</li>
-        <li className="legend__item"><span className="legend__marker legend__marker--log" aria-hidden="true" /> {strings.legendLogged}</li>
-        <li className="legend__item"><span className="legend__marker legend__marker--today" aria-hidden="true" /> {strings.legendToday}</li>
+        <li className="legend__item"><span className="legend__marker legend__marker--period" aria-hidden="true" /> {t.legendPeriod}</li>
+        <li className="legend__item"><span className="legend__marker legend__marker--predicted" aria-hidden="true" /> {t.legendPredicted}</li>
+        <li className="legend__item"><span className="legend__marker legend__marker--log" aria-hidden="true" /> {t.legendLogged}</li>
+        <li className="legend__item"><span className="legend__marker legend__marker--today" aria-hidden="true" /> {t.legendToday}</li>
       </ul>
 
       {selected !== null && <LogSheet date={selected} onClose={() => setSelected(null)} />}

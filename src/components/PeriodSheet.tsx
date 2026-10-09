@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
 import { createPeriod, deletePeriod, updatePeriod } from '../db/queries';
 import { Sheet } from './Sheet';
-import { formatDayLong, today } from '../logic/dates';
+import { today } from '../logic/dates';
 import { validatePeriod } from '../logic/validation';
 import type { Period } from '../db/types';
 
@@ -15,6 +15,7 @@ interface PeriodSheetProps {
 type Editing = Period | 'new' | null;
 
 export function PeriodSheet({ onClose }: PeriodSheetProps) {
+  const { t, formatDay } = useI18n();
   const periods = useLiveQuery(() => db.periods.toArray(), []);
   const [editing, setEditing] = useState<Editing>(null);
   const [start, setStart] = useState('');
@@ -27,25 +28,26 @@ export function PeriodSheet({ onClose }: PeriodSheetProps) {
     setEnd(target !== null && target !== 'new' && target.endDate !== null ? target.endDate : '');
     setError(null);
   }
-    async function handleSave() {
+
+  async function handleSave() {
     if (start === '') return;
     const endDate = end === '' ? null : end;
     const ignoreId = editing !== null && editing !== 'new' ? editing.id : undefined;
     const existing = await db.periods.toArray();
     const validation = validatePeriod(start, endDate, existing, ignoreId);
-    if (validation === 'overlap') { setError(strings.errorPeriodOverlap); return; }
-    if (validation === 'end-before-start') { setError(strings.errorEndBeforeStart); return; }
+    if (validation === 'overlap') { setError(t.errorPeriodOverlap); return; }
+    if (validation === 'end-before-start') { setError(t.errorEndBeforeStart); return; }
     if (editing === 'new') {
       await createPeriod(start, endDate);
     } else if (editing !== null) {
       await updatePeriod({ ...editing, startDate: start, endDate });
     }
     setEditing(null);
-    }
+  }
 
   async function handleDelete(period: Period) {
     // Delete confirmation (spec 4.1).
-    if (!window.confirm(strings.deletePeriodConfirm)) return;
+    if (!window.confirm(t.deletePeriodConfirm)) return;
     await deletePeriod(period.id);
   }
 
@@ -53,24 +55,24 @@ export function PeriodSheet({ onClose }: PeriodSheetProps) {
 
   return (
     <Sheet
-      title={editing === null ? strings.periodsTitle : editing === 'new' ? strings.addPeriod : strings.editPeriod}
+      title={editing === null ? t.periodsTitle : editing === 'new' ? t.addPeriod : t.editPeriod}
       onClose={onClose}
     >
       {editing === null ? (
         <>
           <button type="button" className="btn btn--primary" onClick={() => openEdit('new')}>
-            {strings.addPeriod}
+            {t.addPeriod}
           </button>
-          {sorted.length === 0 && <p className="card__note">{strings.noPeriods}</p>}
+          {sorted.length === 0 && <p className="card__note">{t.noPeriods}</p>}
           <ul className="entry-list">
             {sorted.map((period) => (
               <li key={period.id} className="period-row">
                 <span>
-                  {formatDayLong(period.startDate)} – {period.endDate !== null ? formatDayLong(period.endDate) : strings.periodOngoing}
+                  {formatDay(period.startDate)} – {period.endDate !== null ? formatDay(period.endDate) : t.periodOngoing}
                 </span>
                 <span className="period-row__actions">
-                  <button type="button" className="btn btn--ghost" onClick={() => openEdit(period)}>{strings.edit}</button>
-                  <button type="button" className="btn btn--ghost" onClick={() => handleDelete(period)}>{strings.delete}</button>
+                  <button type="button" className="btn btn--ghost" onClick={() => openEdit(period)}>{t.edit}</button>
+                  <button type="button" className="btn btn--ghost" onClick={() => handleDelete(period)}>{t.delete}</button>
                 </span>
               </li>
             ))}
@@ -80,16 +82,16 @@ export function PeriodSheet({ onClose }: PeriodSheetProps) {
         <>
           {error !== null && <p className="error" role="alert">{error}</p>}
           <div className="field">
-            <label className="field__label" htmlFor="period-start">{strings.periodStartLabel}</label>
+            <label className="field__label" htmlFor="period-start">{t.periodStartLabel}</label>
             <input id="period-start" className="input" type="date" value={start} max={today()} onChange={(event) => setStart(event.target.value)} />
           </div>
           <div className="field">
-            <label className="field__label" htmlFor="period-end">{strings.periodEndLabel}</label>
+            <label className="field__label" htmlFor="period-end">{t.periodEndLabel}</label>
             <input id="period-end" className="input" type="date" value={end} min={start || undefined} onChange={(event) => setEnd(event.target.value)} />
           </div>
           <div className="actions">
-            <button type="button" className="btn btn--primary" disabled={start === ''} onClick={handleSave}>{strings.save}</button>
-            <button type="button" className="btn btn--ghost" onClick={() => setEditing(null)}>{strings.cancel}</button>
+            <button type="button" className="btn btn--primary" disabled={start === ''} onClick={handleSave}>{t.save}</button>
+            <button type="button" className="btn btn--ghost" onClick={() => setEditing(null)}>{t.cancel}</button>
           </div>
         </>
       )}

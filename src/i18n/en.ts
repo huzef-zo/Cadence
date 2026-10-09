@@ -264,10 +264,6 @@ export const moodLabels: Record<1 | 2 | 3 | 4 | 5, string> = {
 };
 
 // Canonical tag ids are stored in the database; labels come from here.
-export const moodTagKeys = ['calm', 'anxious', 'irritable', 'sad', 'energetic', 'tired'] as const;
-export const painTagKeys = ['cramps', 'lower-back', 'headache', 'breast-tenderness', 'other'] as const;
-export const symptomKeys = ['bloating', 'acne', 'nausea', 'cravings', 'poor-sleep', 'low-energy', 'dizziness'] as const;
-
 export const tagLabels: Record<string, string> = {
   calm: strings.tagCalm,
   anxious: strings.tagAnxious,
@@ -288,3 +284,12 @@ export const tagLabels: Record<string, string> = {
   'low-energy': strings.symptomLowEnergy,
   dizziness: strings.symptomDizziness,
 };
+
+export const en = {
+  ...strings,
+  flowLabels,
+  moodLabels,
+  tagLabels,
+};
+
+export type Strings = typeof en;

@@ -1,4 +1,4 @@
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 
 export interface DayInfo {
   date: string; // YYYY-MM-DD
@@ -18,11 +18,12 @@ interface DayCellProps {
 // background (period), dashed border (predicted), ring (today), dot (has a
 // log) — and by the accessible label; never by color alone (spec 4.4 / 2.6).
 export function DayCell({ day, onSelect }: DayCellProps) {
+  const { t } = useI18n();
   const markers: string[] = [];
-  if (day.isPeriod) markers.push(strings.legendPeriod);
-  if (day.isPredicted) markers.push(strings.legendPredicted);
-  if (day.hasLog) markers.push(strings.legendLogged);
-  if (day.isToday) markers.push(strings.legendToday);
+  if (day.isPeriod) markers.push(t.legendPeriod);
+  if (day.isPredicted) markers.push(t.legendPredicted);
+  if (day.hasLog) markers.push(t.legendLogged);
+  if (day.isToday) markers.push(t.legendToday);
 
   return (
     <button

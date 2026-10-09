@@ -1,13 +1,6 @@
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 
 export type Tab = 'today' | 'calendar' | 'history' | 'settings';
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'today', label: strings.tabToday },
-  { id: 'calendar', label: strings.tabCalendar },
-  { id: 'history', label: strings.tabHistory },
-  { id: 'settings', label: strings.tabSettings },
-];
 
 interface TabBarProps {
   active: Tab;
@@ -15,9 +8,18 @@ interface TabBarProps {
 }
 
 export function TabBar({ active, onChange }: TabBarProps) {
+  const { t } = useI18n();
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'today', label: t.tabToday },
+    { id: 'calendar', label: t.tabCalendar },
+    { id: 'history', label: t.tabHistory },
+    { id: 'settings', label: t.tabSettings },
+  ];
+
   return (
-    <nav className="tabbar" aria-label={strings.appName}>
-      {TABS.map((tab) => (
+    <nav className="tabbar" aria-label={t.appName}>
+      {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"

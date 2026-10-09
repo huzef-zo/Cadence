@@ -1,15 +1,6 @@
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 
 type Mood = 1 | 2 | 3 | 4 | 5;
-
-const MOOD_OPTIONS: { value: Mood | null; label: string }[] = [
-  { value: null, label: strings.fieldNotSet },
-  { value: 1, label: strings.moodVeryLow },
-  { value: 2, label: strings.moodLow },
-  { value: 3, label: strings.moodNeutral },
-  { value: 4, label: strings.moodGood },
-  { value: 5, label: strings.moodGreat },
-];
 
 interface MoodPickerProps {
   value: Mood | null;
@@ -17,11 +8,22 @@ interface MoodPickerProps {
 }
 
 export function MoodPicker({ value, onChange }: MoodPickerProps) {
+  const { t } = useI18n();
+
+  const moodOptions: { value: Mood | null; label: string }[] = [
+    { value: null, label: t.fieldNotSet },
+    { value: 1, label: t.moodVeryLow },
+    { value: 2, label: t.moodLow },
+    { value: 3, label: t.moodNeutral },
+    { value: 4, label: t.moodGood },
+    { value: 5, label: t.moodGreat },
+  ];
+
   return (
     <fieldset className="field">
-      <legend className="field__label">{strings.logMood}</legend>
+      <legend className="field__label">{t.logMood}</legend>
       <div className="chip-group">
-        {MOOD_OPTIONS.map((option) => (
+        {moodOptions.map((option) => (
           <label key={option.label} className={`chip${value === option.value ? ' chip--on' : ''}`}>
             <input
               type="radio"

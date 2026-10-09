@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
 import { getSettings, saveSettings } from '../db/queries';
@@ -19,6 +19,7 @@ import { cyclesToCsv, summaryFilename } from '../logic/summary';
 import type { Settings as SettingsData } from '../db/types';
 
 export function Settings() {
+  const { t } = useI18n();
   const settings = useLiveQuery(() => getSettings(), []);
   const [status, setStatus] = useState<string | null>(null);
   const [pendingImport, setPendingImport] = useState<BackupFile | null>(null);
@@ -29,11 +30,12 @@ export function Settings() {
   if (!settings) {
     return (
       <main className="screen">
-        <h1 className="screen__title">{strings.tabSettings}</h1>
+        <h1 className="screen__title">{t.tabSettings}</h1>
       </main>
     );
   }
-    const patchSettings = async (patch: Partial<Omit<SettingsData, 'key'>>) => {
+
+  const patchSettings = async (patch: Partial<Omit<SettingsData, 'key'>>) => {
     await saveSettings({ ...settings, ...patch });
   };
 
@@ -43,7 +45,6 @@ export function Settings() {
 
   const notificationsSupported = typeof Notification !== 'undefined';
   const permission = notificationsSupported ? Notification.permission : 'denied';
-
 
   async function requestPermissionIfNeeded(): Promise<boolean> {
     if (!notificationsSupported) return false;
@@ -57,7 +58,7 @@ export function Settings() {
   async function handleExport() {
     await exportBackup(db);
     await patchSettings({ lastExportReminderAt: today() });
-    setStatus(strings.dataExportDone);
+    setStatus(t.dataExportDone);
   }
 
   async function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
@@ -66,7 +67,7 @@ export function Settings() {
     if (!file) return;
     const backup = await readBackupFile(file);
     if (backup === null) {
-      setStatus(strings.dataImportInvalid);
+      setStatus(t.dataImportInvalid);
       return;
     }
     setPendingImport(backup); // ask merge or replace (spec 4.8)
@@ -75,10 +76,10 @@ export function Settings() {
 
   async function handleImport(mode: ImportMode) {
     if (pendingImport === null) return;
-    if (mode === 'replace' && !window.confirm(strings.dataImportReplaceConfirm)) return;
+    if (mode === 'replace' && !window.confirm(t.dataImportReplaceConfirm)) return;
     const result = await applyBackup(db, pendingImport, mode);
     setPendingImport(null);
-    setStatus(strings.dataImportResult(result.periods, result.entries));
+    setStatus(t.dataImportResult(result.periods, result.entries));
   }
 
   async function handleSummary() {
@@ -93,11 +94,11 @@ export function Settings() {
   async function handleSavePin(event: FormEvent) {
     event.preventDefault();
     if (!isValidPin(pin, PIN_MIN_LENGTH, PIN_MAX_LENGTH)) {
-      setStatus(strings.lockInvalid);
+      setStatus(t.lockInvalid);
       return;
     }
     if (pin !== confirmPin) {
-      setStatus(strings.lockMismatch);
+      setStatus(t.lockMismatch);
       return;
     }
     const salt = generateSalt();
@@ -105,42 +106,42 @@ export function Settings() {
     await patchSettings({ lockEnabled: true, lockHash: hash, lockSalt: salt });
     setPin('');
     setConfirmPin('');
-    setStatus(strings.lockSaved);
+    setStatus(t.lockSaved);
   }
 
   async function handleDisableLock() {
-    if (!window.confirm(strings.lockDisableConfirm)) return;
+    if (!window.confirm(t.lockDisableConfirm)) return;
     await patchSettings({ lockEnabled: false, lockHash: null, lockSalt: null });
   }
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{strings.tabSettings}</h1>
+      <h1 className="screen__title">{t.tabSettings}</h1>
       {status !== null && <p className="status" role="status">{status}</p>}
 
-      <section className="card" aria-label={strings.sectionPattern}>
-        <h2 className="card__heading">{strings.sectionPattern}</h2>
+      <section className="card" aria-label={t.sectionPattern}>
+        <h2 className="card__heading">{t.sectionPattern}</h2>
         <div className="field">
-          <label className="field__label" htmlFor="override">{strings.overrideLabel}</label>
+          <label className="field__label" htmlFor="override">{t.overrideLabel}</label>
           <select
             id="override"
             className="input"
             value={settings.regularityOverride}
             onChange={(event) => patchSettings({ regularityOverride: event.target.value as SettingsData['regularityOverride'] })}
           >
-            <option value="auto">{strings.overrideAuto}</option>
-            <option value="regular">{strings.overrideRegular}</option>
-            <option value="irregular">{strings.overrideIrregular}</option>
+            <option value="auto">{t.overrideAuto}</option>
+            <option value="regular">{t.overrideRegular}</option>
+            <option value="irregular">{t.overrideIrregular}</option>
           </select>
-          <p className="field__hint">{strings.overrideHint}</p>
+          <p className="field__hint">{t.overrideHint}</p>
         </div>
       </section>
 
-      <section className="card" aria-label={strings.sectionReminders}>
-        <h2 className="card__heading">{strings.sectionReminders}</h2>
-        {!notificationsSupported && <p className="card__note">{strings.remindersUnsupported}</p>}
+      <section className="card" aria-label={t.sectionReminders}>
+        <h2 className="card__heading">{t.sectionReminders}</h2>
+        {!notificationsSupported && <p className="card__note">{t.remindersUnsupported}</p>}
         {notificationsSupported && permission === 'denied' && (
-          <p className="card__note">{strings.remindersPermissionNeeded}</p>
+          <p className="card__note">{t.remindersPermissionNeeded}</p>
         )}
         {notificationsSupported && (
           <>
@@ -153,11 +154,11 @@ export function Settings() {
                   await patchReminders({ periodSoon: event.target.checked });
                 }}
               />
-              <span>{strings.periodSoonToggle}</span>
+              <span>{t.periodSoonToggle}</span>
             </label>
             {settings.reminders.periodSoon && (
               <div className="field">
-                <label className="field__label" htmlFor="days-before">{strings.daysBeforeLabel}</label>
+                <label className="field__label" htmlFor="days-before">{t.daysBeforeLabel}</label>
                 <input
                   id="days-before"
                   className="input"
@@ -180,11 +181,11 @@ export function Settings() {
                   await patchReminders({ dailyLog: event.target.checked });
                 }}
               />
-              <span>{strings.dailyLogToggle}</span>
+              <span>{t.dailyLogToggle}</span>
             </label>
             {settings.reminders.dailyLog && (
               <div className="field">
-                <label className="field__label" htmlFor="daily-time">{strings.dailyTimeLabel}</label>
+                <label className="field__label" htmlFor="daily-time">{t.dailyTimeLabel}</label>
                 <input
                   id="daily-time"
                   className="input"
@@ -198,18 +199,18 @@ export function Settings() {
         )}
       </section>
 
-      <section className="card" aria-label={strings.sectionLock}>
-        <h2 className="card__heading">{strings.sectionLock}</h2>
+      <section className="card" aria-label={t.sectionLock}>
+        <h2 className="card__heading">{t.sectionLock}</h2>
         {settings.lockEnabled ? (
           <button type="button" className="btn btn--secondary" onClick={handleDisableLock}>
-            {strings.lockDisable}
+            {t.lockDisable}
           </button>
         ) : (
           <>
-            <p className="card__note">{strings.lockWarning}</p>
+            <p className="card__note">{t.lockWarning}</p>
             <form className="form-grid" onSubmit={handleSavePin}>
               <div className="field">
-                <label className="field__label" htmlFor="lock-pin">{strings.lockPinLabel}</label>
+                <label className="field__label" htmlFor="lock-pin">{t.lockPinLabel}</label>
                 <input
                   id="lock-pin"
                   className="input"
@@ -221,7 +222,7 @@ export function Settings() {
                 />
               </div>
               <div className="field">
-                <label className="field__label" htmlFor="lock-pin-confirm">{strings.lockConfirmLabel}</label>
+                <label className="field__label" htmlFor="lock-pin-confirm">{t.lockConfirmLabel}</label>
                 <input
                   id="lock-pin-confirm"
                   className="input"
@@ -232,58 +233,58 @@ export function Settings() {
                   onChange={(event) => setConfirmPin(event.target.value.replace(/\D/g, '').slice(0, PIN_MAX_LENGTH))}
                 />
               </div>
-              <button type="submit" className="btn btn--primary">{strings.save}</button>
+              <button type="submit" className="btn btn--primary">{t.save}</button>
             </form>
           </>
         )}
       </section>
 
-      <section className="card" aria-label={strings.sectionTheme}>
-        <h2 className="card__heading">{strings.sectionTheme}</h2>
+      <section className="card" aria-label={t.sectionTheme}>
+        <h2 className="card__heading">{t.sectionTheme}</h2>
         <div className="field">
-          <label className="field__label" htmlFor="theme">{strings.sectionTheme}</label>
+          <label className="field__label" htmlFor="theme">{t.sectionTheme}</label>
           <select
             id="theme"
             className="input"
             value={settings.theme}
             onChange={(event) => patchSettings({ theme: event.target.value as SettingsData['theme'] })}
           >
-            <option value="system">{strings.themeSystem}</option>
-            <option value="light">{strings.themeLight}</option>
-            <option value="dark">{strings.themeDark}</option>
+            <option value="system">{t.themeSystem}</option>
+            <option value="light">{t.themeLight}</option>
+            <option value="dark">{t.themeDark}</option>
           </select>
         </div>
       </section>
 
-      <section className="card" aria-label={strings.sectionData}>
-        <h2 className="card__heading">{strings.sectionData}</h2>
+      <section className="card" aria-label={t.sectionData}>
+        <h2 className="card__heading">{t.sectionData}</h2>
         <div className="actions">
           <button type="button" className="btn btn--secondary" onClick={handleExport}>
-            {strings.dataExport}
+            {t.dataExport}
           </button>
           <label className="btn btn--secondary">
-            {strings.dataImport}
+            {t.dataImport}
             <input type="file" accept=".json,application/json" style={{ display: 'none' }} onChange={handleImportFile} />
           </label>
           {pendingImport !== null && (
             <>
               <button type="button" className="btn btn--primary" onClick={() => handleImport('merge')}>
-                {strings.dataImportMerge}
+                {t.dataImportMerge}
               </button>
               <button type="button" className="btn btn--danger" onClick={() => handleImport('replace')}>
-                {strings.dataImportReplace}
+                {t.dataImportReplace}
               </button>
             </>
           )}
           <button type="button" className="btn btn--secondary" onClick={handleSummary}>
-            {strings.shareSummary}
+            {t.shareSummary}
           </button>
         </div>
 
-        <h3 className="card__subheading">{strings.dataDelete}</h3>
-        <p className="card__note">{strings.dataDeleteWarning}</p>
+        <h3 className="card__subheading">{t.dataDelete}</h3>
+        <p className="card__note">{t.dataDeleteWarning}</p>
         <div className="field">
-          <label className="field__label" htmlFor="delete-confirm">{strings.dataDeleteTypeLabel}</label>
+          <label className="field__label" htmlFor="delete-confirm">{t.dataDeleteTypeLabel}</label>
           <input
             id="delete-confirm"
             className="input"
@@ -298,18 +299,18 @@ export function Settings() {
           disabled={deleteText !== 'DELETE'}
           onClick={handleDeleteAll}
         >
-          {strings.dataDeleteButton}
+          {t.dataDeleteButton}
         </button>
       </section>
 
-      <section className="card" aria-label={strings.sectionAbout}>
-        <h2 className="card__heading">{strings.sectionAbout}</h2>
-        <p>{strings.appName} · {strings.aboutVersion} {__APP_VERSION__}</p>
-        <p>{strings.aboutLicense}: {strings.aboutLicenseValue}</p>
-        <p><a href={strings.sourceRepoUrl}>{strings.aboutSource}</a></p>
-        <p>{strings.disclaimer}</p>
-        <p>{strings.privacyStatement}</p>
+      <section className="card" aria-label={t.sectionAbout}>
+        <h2 className="card__heading">{t.sectionAbout}</h2>
+        <p>{t.appName} · {t.aboutVersion} {__APP_VERSION__}</p>
+        <p>{t.aboutLicense}: {t.aboutLicenseValue}</p>
+        <p><a href={t.sourceRepoUrl}>{t.aboutSource}</a></p>
+        <p>{t.disclaimer}</p>
+        <p>{t.privacyStatement}</p>
       </section>
     </main>
   );
-                                                           }
+}

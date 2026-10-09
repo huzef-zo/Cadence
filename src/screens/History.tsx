@@ -3,11 +3,12 @@ import { CycleCard } from '../components/CycleCard';
 import { InsightsView } from '../components/InsightsView';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { deriveCycles } from '../logic/cycles';
 import { mean } from '../logic/stats';
 
 export function History() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'cycles' | 'insights'>('cycles');
   const periods = useLiveQuery(() => db.periods.toArray(), []);
   const entries = useLiveQuery(() => db.entries.toArray(), []);
@@ -15,7 +16,7 @@ export function History() {
   if (!periods || !entries) {
     return (
       <main className="screen">
-        <h1 className="screen__title">{strings.tabHistory}</h1>
+        <h1 className="screen__title">{t.tabHistory}</h1>
       </main>
     );
   }
@@ -30,7 +31,7 @@ export function History() {
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{strings.tabHistory}</h1>
+      <h1 className="screen__title">{t.tabHistory}</h1>
 
       <div className="segmented-control" role="group">
         <button
@@ -39,7 +40,7 @@ export function History() {
           aria-pressed={activeTab === 'cycles'}
           onClick={() => setActiveTab('cycles')}
         >
-          {strings.segmentCycles}
+          {t.segmentCycles}
         </button>
         <button
           type="button"
@@ -47,27 +48,27 @@ export function History() {
           aria-pressed={activeTab === 'insights'}
           onClick={() => setActiveTab('insights')}
         >
-          {strings.segmentInsights}
+          {t.segmentInsights}
         </button>
       </div>
 
       {activeTab === 'cycles' ? (
         cycles.length === 0 ? (
-          <p>{strings.noCycles}</p>
+          <p>{t.noCycles}</p>
         ) : (
           <>
             <div className="summary">
               <div className="summary__item">
-                <p className="summary__value">{averageCycle !== null ? strings.days(averageCycle) : strings.notAvailable}</p>
-                <p className="summary__label">{strings.summaryAvgCycleLength}</p>
+                <p className="summary__value">{averageCycle !== null ? t.days(averageCycle) : t.notAvailable}</p>
+                <p className="summary__label">{t.summaryAvgCycleLength}</p>
               </div>
               <div className="summary__item">
-                <p className="summary__value">{averagePeriod !== null ? strings.days(averagePeriod) : strings.notAvailable}</p>
-                <p className="summary__label">{strings.summaryAvgPeriodLength}</p>
+                <p className="summary__value">{averagePeriod !== null ? t.days(averagePeriod) : t.notAvailable}</p>
+                <p className="summary__label">{t.summaryAvgPeriodLength}</p>
               </div>
               <div className="summary__item">
                 <p className="summary__value">{cycles.length}</p>
-                <p className="summary__label">{strings.summaryCyclesLogged}</p>
+                <p className="summary__label">{t.summaryCyclesLogged}</p>
               </div>
             </div>
             {cycles.map((cycle) => (
