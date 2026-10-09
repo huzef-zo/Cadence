@@ -68,3 +68,14 @@ export function predictNextPeriod(periods: Period[], typicalCycleLength: number 
     lessReliable,
   };
 }
+
+export function isPredictionPassed(
+  prediction: PeriodPrediction | null,
+  day: string,
+  hasOngoingPeriod: boolean,
+): boolean {
+  if (prediction === null || hasOngoingPeriod) {
+    return false;
+  }
+  return prediction.rangeEnd < day;
+}

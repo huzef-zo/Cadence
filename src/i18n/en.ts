@@ -49,6 +49,7 @@ export const strings = {
   predictionEstimateNote: 'Predictions are estimates.',
   predictionBasedOnEstimate: 'Based on the typical length you entered during onboarding, not on logged cycles yet.',
   predictionIrregularNote: 'Your pattern is irregular, so this prediction is less reliable.',
+  predictionPassed: 'The predicted range has passed. Log your period start when it begins.',
   patternRegular: 'Regular pattern',
   patternIrregular: 'Irregular pattern',
   patternNotEnoughData: 'Not enough data yet',

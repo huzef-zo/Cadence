@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { predictNextPeriod } from './prediction';
+import { isPredictionPassed, predictNextPeriod } from './prediction';
 import { addDaysToDay, diffDays } from './dates';
 import type { Period } from '../db/types';
 
@@ -67,5 +67,36 @@ describe('predictNextPeriod', () => {
     const prediction = predictNextPeriod(periods, null)!;
     // the 45-day outlier is excluded; mean of the last 6 = 28
     expect(diffDays(prediction.predictedStart, starts[starts.length - 1])).toBe(28);
+  });
+});
+
+describe('isPredictionPassed', () => {
+  const dummyPrediction = {
+    predictedStart: '2025-03-01',
+    rangeStart: '2025-02-27',
+    rangeEnd: '2025-03-03',
+    predictedPeriodLength: 5,
+    basedOnEstimate: false,
+    lessReliable: false,
+  };
+
+  it('returns false when prediction is null', () => {
+    expect(isPredictionPassed(null, '2025-03-04', false)).toBe(false);
+  });
+
+  it('returns false when there is an ongoing period', () => {
+    expect(isPredictionPassed(dummyPrediction, '2025-03-04', true)).toBe(false);
+  });
+
+  it('returns false when day is inside the prediction range', () => {
+    expect(isPredictionPassed(dummyPrediction, '2025-03-01', false)).toBe(false);
+  });
+
+  it('returns false when day is exactly on rangeEnd', () => {
+    expect(isPredictionPassed(dummyPrediction, '2025-03-03', false)).toBe(false);
+  });
+
+  it('returns true when day is one day after rangeEnd', () => {
+    expect(isPredictionPassed(dummyPrediction, '2025-03-04', false)).toBe(true);
   });
 });
