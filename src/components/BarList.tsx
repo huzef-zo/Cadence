@@ -1,4 +1,4 @@
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { computeBarWidthPercentage } from '../logic/chart';
 
 export interface BarItem {
@@ -12,10 +12,11 @@ export interface BarListProps {
 }
 
 export function BarList({ title, items }: BarListProps) {
+  const { t } = useI18n();
   if (items.length === 0) return null;
 
   const maxCount = Math.max(...items.map((item) => item.count), 0);
-  const summaryAriaLabel = strings.barListAriaLabel(title, items.length);
+  const summaryAriaLabel = t.barListAriaLabel(title, items.length);
 
   return (
     <div className="chart-card">
@@ -42,12 +43,12 @@ export function BarList({ title, items }: BarListProps) {
       </div>
 
       <details className="chart-card__details">
-        <summary className="chart-card__summary">{strings.showDataTable}</summary>
+        <summary className="chart-card__summary">{t.showDataTable}</summary>
         <table className="chart-table">
           <thead>
             <tr>
-              <th scope="col">{strings.tableHeaderLabel}</th>
-              <th scope="col">{strings.tableHeaderCount}</th>
+              <th scope="col">{t.tableHeaderLabel}</th>
+              <th scope="col">{t.tableHeaderCount}</th>
             </tr>
           </thead>
           <tbody>

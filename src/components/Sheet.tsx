@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 
 interface SheetProps {
   title: string;
@@ -9,6 +9,7 @@ interface SheetProps {
 
 // Bottom sheet dialog (mobile-first). Presentational: no logic inside.
 export function Sheet({ title, onClose, children }: SheetProps) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export function Sheet({ title, onClose, children }: SheetProps) {
       >
         <header className="sheet__header">
           <h2 className="sheet__title">{title}</h2>
-          <button type="button" className="btn btn--ghost" onClick={onClose} aria-label={strings.close}>
+          <button type="button" className="btn btn--ghost" onClick={onClose} aria-label={t.close}>
             ✕
           </button>
         </header>

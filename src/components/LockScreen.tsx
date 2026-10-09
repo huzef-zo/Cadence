@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { PIN_MAX_LENGTH, PIN_MIN_LENGTH } from '../logic/config';
 import { verifyPin } from '../logic/lock';
 
@@ -10,6 +10,7 @@ interface LockScreenProps {
 }
 
 export function LockScreen({ lockHash, lockSalt, onUnlock }: LockScreenProps) {
+  const { t } = useI18n();
   const [pin, setPin] = useState('');
   const [wrong, setWrong] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -30,8 +31,8 @@ export function LockScreen({ lockHash, lockSalt, onUnlock }: LockScreenProps) {
   return (
     <div className="lock">
       <form className="lock__form" onSubmit={handleSubmit}>
-        <h1 className="app-title">{strings.appName}</h1>
-        <label className="field__label" htmlFor="lock-pin">{strings.lockTitle}</label>
+        <h1 className="app-title">{t.appName}</h1>
+        <label className="field__label" htmlFor="lock-pin">{t.lockTitle}</label>
         <input
           id="lock-pin"
           className="input input--pin"
@@ -45,9 +46,9 @@ export function LockScreen({ lockHash, lockSalt, onUnlock }: LockScreenProps) {
             setWrong(false);
           }}
         />
-        {wrong && <p className="error" role="alert">{strings.lockWrong}</p>}
+        {wrong && <p className="error" role="alert">{t.lockWrong}</p>}
         <button type="submit" className="btn btn--primary" disabled={busy || pin.length < PIN_MIN_LENGTH}>
-          {strings.lockUnlock}
+          {t.lockUnlock}
         </button>
       </form>
     </div>

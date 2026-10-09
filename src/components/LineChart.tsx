@@ -1,4 +1,4 @@
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import {
   computeLineChartPoints,
   computePathData,
@@ -15,6 +15,7 @@ export interface LineChartProps {
 }
 
 export function LineChart({ title, points, yMin, yMax, unitLabel }: LineChartProps) {
+  const { t } = useI18n();
   if (points.length === 0) return null;
 
   const dims = DEFAULT_LINE_CHART_DIMENSIONS;
@@ -27,7 +28,7 @@ export function LineChart({ title, points, yMin, yMax, unitLabel }: LineChartPro
   const firstValFormatted = unitLabel ? `${firstPoint.value} ${unitLabel}` : `${firstPoint.value}`;
   const lastValFormatted = unitLabel ? `${lastPoint.value} ${unitLabel}` : `${lastPoint.value}`;
 
-  const summaryAriaLabel = strings.lineChartAriaLabel(
+  const summaryAriaLabel = t.lineChartAriaLabel(
     title,
     points.length,
     `${firstPoint.label}: ${firstValFormatted}`,
@@ -138,12 +139,12 @@ export function LineChart({ title, points, yMin, yMax, unitLabel }: LineChartPro
       </div>
 
       <details className="chart-card__details">
-        <summary className="chart-card__summary">{strings.showDataTable}</summary>
+        <summary className="chart-card__summary">{t.showDataTable}</summary>
         <table className="chart-table">
           <thead>
             <tr>
-              <th scope="col">{strings.tableHeaderLabel}</th>
-              <th scope="col">{strings.tableHeaderValue}</th>
+              <th scope="col">{t.tableHeaderLabel}</th>
+              <th scope="col">{t.tableHeaderValue}</th>
             </tr>
           </thead>
           <tbody>

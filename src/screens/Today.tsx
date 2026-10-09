@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery, useToday } from '../db/hooks';
 import { getSettings, saveSettings, createPeriod, updatePeriod } from '../db/queries';
@@ -16,18 +16,13 @@ import {
   MIN_CYCLES_FOR_PATTERN,
 } from '../logic/config';
 import { deriveCycles } from '../logic/cycles';
-import { diffDays, formatDayLong } from '../logic/dates';
+import { diffDays } from '../logic/dates';
 import { isPredictionPassed, predictNextPeriod } from '../logic/prediction';
 import { displayedPatternLabel, overallPatternLabel, type PatternLabel } from '../logic/regularity';
 import { validatePeriod } from '../logic/validation';
 
-const PATTERN_TEXT: Record<PatternLabel, string> = {
-  regular: strings.patternRegular,
-  irregular: strings.patternIrregular,
-  'not-enough-data': strings.patternNotEnoughData,
-};
-
 export function Today() {
+  const { t, formatDay } = useI18n();
   const day = useToday();
   const settings = useLiveQuery(() => getSettings(), []);
   const periods = useLiveQuery(() => db.periods.toArray(), []);
@@ -37,10 +32,16 @@ export function Today() {
   const [error, setError] = useState<string | null>(null);
   const [showPatternInfo, setShowPatternInfo] = useState(false);
 
+  const patternText: Record<PatternLabel, string> = {
+    regular: t.patternRegular,
+    irregular: t.patternIrregular,
+    'not-enough-data': t.patternNotEnoughData,
+  };
+
   if (!settings || !periods) {
     return (
       <main className="screen">
-        <h1 className="screen__title">{strings.tabToday}</h1>
+        <h1 className="screen__title">{t.tabToday}</h1>
       </main>
     );
   }
@@ -52,10 +53,10 @@ export function Today() {
 
   // "Period day N" while ongoing, otherwise "Day N of your cycle" (spec 4.6).
   const status = ongoing
-    ? strings.statusPeriodDay(diffDays(day, ongoing.startDate) + 1)
+    ? t.statusPeriodDay(diffDays(day, ongoing.startDate) + 1)
     : lastStart !== null
-      ? strings.statusCycleDay(diffDays(day, lastStart) + 1)
-      : strings.statusNoData;
+      ? t.statusCycleDay(diffDays(day, lastStart) + 1)
+      : t.statusNoData;
 
   const prediction = predictNextPeriod(periods, settings.typicalCycleLength);
   const pattern = displayedPatternLabel(overallPatternLabel(cycles), settings.regularityOverride);
@@ -71,7 +72,7 @@ export function Today() {
     setError(null);
     const validation = validatePeriod(day, null, await db.periods.toArray());
     if (validation !== null) {
-      setError(validation === 'overlap' ? strings.errorPeriodOverlap : strings.errorEndBeforeStart);
+      setError(validation === 'overlap' ? t.errorPeriodOverlap : t.errorEndBeforeStart);
       return;
     }
     await createPeriod(day, null);
@@ -83,29 +84,29 @@ export function Today() {
     await updatePeriod({ ...ongoing, endDate: day });
   }
 
-    const handleExportReminder = async () => {
+  const handleExportReminder = async () => {
     await exportBackup(db);
     await saveSettings({ ...settings, lastExportReminderAt: day });
   };
 
   return (
     <main className="screen">
-      <h1 className="screen__title">{strings.tabToday}</h1>
+      <h1 className="screen__title">{t.tabToday}</h1>
 
       {showExportReminder && (
-        <section className="banner" aria-label={strings.exportReminderTitle}>
-          <p className="banner__title">{strings.exportReminderTitle}</p>
-          <p>{strings.exportReminderBody}</p>
+        <section className="banner" aria-label={t.exportReminderTitle}>
+          <p className="banner__title">{t.exportReminderTitle}</p>
+          <p>{t.exportReminderBody}</p>
           <div className="banner__actions">
             <button type="button" className="btn btn--primary" onClick={handleExportReminder}>
-              {strings.exportReminderAction}
+              {t.exportReminderAction}
             </button>
             <button
               type="button"
               className="btn btn--ghost"
               onClick={() => saveSettings({ ...settings, lastExportReminderAt: day })}
             >
-              {strings.exportReminderDismiss}
+              {t.exportReminderDismiss}
             </button>
           </div>
         </section>
@@ -119,12 +120,12 @@ export function Today() {
           aria-expanded={showPatternInfo}
           onClick={() => setShowPatternInfo((value) => !value)}
         >
-          {PATTERN_TEXT[pattern]}
+          {patternText[pattern]}
         </button>
         {showPatternInfo && (
           <p className="card__note">
-            <strong>{strings.patternExplanationTitle}. </strong>
-            {strings.patternExplanation(CYCLE_LENGTH_MIN, CYCLE_LENGTH_MAX, MAX_VARIATION, MIN_CYCLES_FOR_PATTERN)}
+            <strong>{t.patternExplanationTitle}. </strong>
+            {t.patternExplanation(CYCLE_LENGTH_MIN, CYCLE_LENGTH_MAX, MAX_VARIATION, MIN_CYCLES_FOR_PATTERN)}
           </p>
         )}
       </section>
@@ -133,46 +134,46 @@ export function Today() {
         {prediction ? (
           <>
             <p className="card__big">
-              {strings.predictionRange(formatDayLong(prediction.rangeStart), formatDayLong(prediction.rangeEnd))}
+              {t.predictionRange(formatDay(prediction.rangeStart), formatDay(prediction.rangeEnd))}
             </p>
-            <p className="card__note">{strings.predictionEstimateNote}</p>
-            {prediction.basedOnEstimate && <p className="card__note">{strings.predictionBasedOnEstimate}</p>}
-            {prediction.lessReliable && <p className="card__note">{strings.predictionIrregularNote}</p>}
+            <p className="card__note">{t.predictionEstimateNote}</p>
+            {prediction.basedOnEstimate && <p className="card__note">{t.predictionBasedOnEstimate}</p>}
+            {prediction.lessReliable && <p className="card__note">{t.predictionIrregularNote}</p>}
             {isPredictionPassed(prediction, day, Boolean(ongoing)) && (
-              <p className="card__note">{strings.predictionPassed}</p>
+              <p className="card__note">{t.predictionPassed}</p>
             )}
           </>
         ) : (
-          <p>{strings.predictionNeedCycles}</p>
+          <p>{t.predictionNeedCycles}</p>
         )}
       </section>
 
       <div className="actions">
         {!ongoing && (
           <button type="button" className="btn btn--primary" onClick={handleStartPeriod}>
-            {strings.actionPeriodStarted}
+            {t.actionPeriodStarted}
           </button>
         )}
         {ongoing && (
           <button type="button" className="btn btn--primary" onClick={handleEndPeriod}>
-            {strings.actionPeriodEnded}
+            {t.actionPeriodEnded}
           </button>
         )}
         <button type="button" className="btn btn--secondary" onClick={() => setLogOpen(true)}>
-          {strings.actionLogToday}
+          {t.actionLogToday}
         </button>
         <button type="button" className="btn btn--ghost" onClick={() => setPeriodsOpen(true)}>
-          {strings.managePeriods}
+          {t.managePeriods}
         </button>
       </div>
 
       {error !== null && <p className="error" role="alert">{error}</p>}
 
       {entry && (
-        <section className="card" aria-label={strings.todayEntryTitle}>
-          <h2 className="card__heading">{strings.todayEntryTitle}</h2>
+        <section className="card" aria-label={t.todayEntryTitle}>
+          <h2 className="card__heading">{t.todayEntryTitle}</h2>
           <ul className="entry-list">
-            {entrySummaryLines(entry).map((line, index) => (
+            {entrySummaryLines(entry, t).map((line, index) => (
               <li key={index}>{line}</li>
             ))}
           </ul>
@@ -183,4 +184,4 @@ export function Today() {
       {periodsOpen && <PeriodSheet onClose={() => setPeriodsOpen(false)} />}
     </main>
   );
-      }
+}

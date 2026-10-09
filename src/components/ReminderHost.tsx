@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { strings } from '../i18n/en';
+import { useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
 import { listPeriods } from '../db/queries';
@@ -22,6 +22,7 @@ function notify(title: string, body: string) {
 // Non-visual host: checks once a minute while the app is open and fires local
 // notifications when due. Never required; hidden gracefully when unsupported.
 export function ReminderHost() {
+  const { t } = useI18n();
   const settings = useLiveQuery(() => db.settings.get('main'), []);
   const periods = useLiveQuery(() => listPeriods(), []);
 
@@ -39,7 +40,7 @@ export function ReminderHost() {
         const key = `daily:${day}`;
         if (target !== null && minutesNow(now) >= target && !firedKeys.has(key)) {
           firedKeys.add(key);
-          notify(strings.reminderDailyLogTitle, strings.reminderDailyLogBody);
+          notify(t.reminderDailyLogTitle, t.reminderDailyLogBody);
         }
       }
 
@@ -50,7 +51,7 @@ export function ReminderHost() {
           const key = `period-soon:${remindOn}`;
           if (remindOn === day && !firedKeys.has(key)) {
             firedKeys.add(key);
-            notify(strings.reminderPeriodSoonTitle, strings.reminderPeriodSoonBody);
+            notify(t.reminderPeriodSoonTitle, t.reminderPeriodSoonBody);
           }
         }
       }
@@ -59,7 +60,7 @@ export function ReminderHost() {
     tick();
     const interval = window.setInterval(tick, REMINDER_TICK_MS);
     return () => window.clearInterval(interval);
-  }, [settings, periods]);
+  }, [settings, periods, t]);
 
   return null;
 }
