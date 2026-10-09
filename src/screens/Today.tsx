@@ -17,7 +17,7 @@ import {
 } from '../logic/config';
 import { deriveCycles } from '../logic/cycles';
 import { diffDays, formatDayLong } from '../logic/dates';
-import { predictNextPeriod } from '../logic/prediction';
+import { isPredictionPassed, predictNextPeriod } from '../logic/prediction';
 import { displayedPatternLabel, overallPatternLabel, type PatternLabel } from '../logic/regularity';
 import { validatePeriod } from '../logic/validation';
 
@@ -138,6 +138,9 @@ export function Today() {
             <p className="card__note">{strings.predictionEstimateNote}</p>
             {prediction.basedOnEstimate && <p className="card__note">{strings.predictionBasedOnEstimate}</p>}
             {prediction.lessReliable && <p className="card__note">{strings.predictionIrregularNote}</p>}
+            {isPredictionPassed(prediction, day, Boolean(ongoing)) && (
+              <p className="card__note">{strings.predictionPassed}</p>
+            )}
           </>
         ) : (
           <p>{strings.predictionNeedCycles}</p>
