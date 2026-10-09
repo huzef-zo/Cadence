@@ -11,16 +11,16 @@ import {
 } from 'date-fns';
 import { strings } from '../i18n/en';
 import { db } from '../db/db';
-import { useLiveQuery } from '../db/hooks';
+import { useLiveQuery, useToday } from '../db/hooks';
 import { DayCell, type DayInfo } from '../components/DayCell';
 import { LogSheet } from '../components/LogSheet';
-import { addDaysToDay, today } from '../logic/dates';
+import { addDaysToDay } from '../logic/dates';
 import { predictNextPeriod } from '../logic/prediction';
 import type { Period } from '../db/types';
 
-function periodDaysFrom(periods: Period[]): Set<string> {
+function periodDaysFrom(periods: Period[], todayString: string): Set<string> {
   const days = new Set<string>();
-  const lastDay = today();
+  const lastDay = todayString;
   for (const period of periods) {
     // An ongoing period (no end date yet) is marked up to today.
     const end = period.endDate ?? (period.startDate <= lastDay ? lastDay : period.startDate);
@@ -32,6 +32,7 @@ function periodDaysFrom(periods: Period[]): Set<string> {
 }
 
 export function Calendar() {
+  const todayString = useToday();
   const [month, setMonth] = useState(() => startOfMonth(new Date()));
   const [selected, setSelected] = useState<string | null>(null);
   const periods = useLiveQuery(() => db.periods.toArray(), []);
@@ -40,7 +41,7 @@ export function Calendar() {
 
   const days = useMemo<DayInfo[]>(() => {
     if (!periods || !entries) return [];
-    const periodDays = periodDaysFrom(periods);
+    const periodDays = periodDaysFrom(periods, todayString);
 
     // Predicted period days: union of the predicted-start range and the
     // predicted bleeding days after it.
@@ -56,7 +57,6 @@ export function Calendar() {
     const loggedDays = new Set(entries.map((entry) => entry.date));
     const gridStart = startOfWeek(startOfMonth(month));
     const gridEnd = endOfWeek(endOfMonth(month));
-    const dayToday = today();
 
     return eachDayOfInterval({ start: gridStart, end: gridEnd }).map((date) => {
       const dayString = format(date, 'yyyy-MM-dd');
@@ -66,10 +66,10 @@ export function Calendar() {
         isPeriod: periodDays.has(dayString),
         isPredicted: !periodDays.has(dayString) && predictedDays.has(dayString),
         hasLog: loggedDays.has(dayString),
-        isToday: dayString === dayToday,
+        isToday: dayString === todayString,
       };
     });
-  }, [periods, entries, settings, month]);
+  }, [periods, entries, settings, month, todayString]);
 
   return (
     <main className="screen">

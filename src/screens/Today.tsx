@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { strings } from '../i18n/en';
 import { db } from '../db/db';
-import { useLiveQuery } from '../db/hooks';
+import { useLiveQuery, useToday } from '../db/hooks';
 import { getSettings, saveSettings, createPeriod, updatePeriod } from '../db/queries';
 import { exportBackup } from '../db/backup';
 import { LogSheet } from '../components/LogSheet';
@@ -16,7 +16,7 @@ import {
   MIN_CYCLES_FOR_PATTERN,
 } from '../logic/config';
 import { deriveCycles } from '../logic/cycles';
-import { diffDays, formatDayLong, today, toDay } from '../logic/dates';
+import { diffDays, formatDayLong } from '../logic/dates';
 import { predictNextPeriod } from '../logic/prediction';
 import { displayedPatternLabel, overallPatternLabel, type PatternLabel } from '../logic/regularity';
 import { validatePeriod } from '../logic/validation';
@@ -28,15 +28,14 @@ const PATTERN_TEXT: Record<PatternLabel, string> = {
 };
 
 export function Today() {
+  const day = useToday();
   const settings = useLiveQuery(() => getSettings(), []);
   const periods = useLiveQuery(() => db.periods.toArray(), []);
-  const entry = useLiveQuery(() => db.entries.get(toDay(new Date())), []);
+  const entry = useLiveQuery(() => db.entries.get(day), [day]);
   const [logOpen, setLogOpen] = useState(false);
   const [periodsOpen, setPeriodsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPatternInfo, setShowPatternInfo] = useState(false);
-
-  const day = today();
 
   if (!settings || !periods) {
     return (
