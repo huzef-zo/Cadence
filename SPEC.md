@@ -224,7 +224,10 @@ interface Settings {
   lockSalt: string | null;
   onboardingDone: boolean;
   schemaVersion: number;
+  lastExportReminderAt: string | null; // YYYY-MM-DD, when the export reminder was last shown or dismissed
 }
+
+New settings fields must be optional in backups and filled from defaults by getSettings, so older backups keep working.
 ```
 
 Backup file format:

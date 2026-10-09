@@ -17,9 +17,8 @@
 - **Import semantics.** "Merge" upserts periods/entries and keeps current
   settings; "replace" also restores settings from the backup.
   TODO(spec): merge semantics for settings are not defined in the spec.
-- **`settings.lastExportReminderAt`** was added (with a TODO in the type) to
-  implement the export reminder cadence from spec 9, which needs a stored
-  timestamp the data model in spec 6 does not include.
+- **`settings.lastExportReminderAt`** is documented in SPEC.md section 6 and
+  implements the export reminder cadence from spec 9.
 - **Icons are SVG.** This text-only repo cannot carry binary PNGs; SVG icons
   with `sizes: "any"` satisfy installability in current browsers.
   TODO(spec): generate 192/512 PNG icons for the manifest.
