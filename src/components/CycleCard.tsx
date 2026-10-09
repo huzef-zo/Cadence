@@ -21,7 +21,7 @@ export function CycleCard({ cycle, entries }: CycleCardProps) {
     .sort((a, b) => a.date.localeCompare(b.date));
 
   const pains = cycleEntries.flatMap((entry) => (entry.pain === null ? [] : [entry.pain]));
-  const moods = cycleEntries.flatMap((entry) => (entry.mood === null ? [entry.mood] : []));
+  const moods = cycleEntries.flatMap((entry) => (entry.mood === null ? [] : [entry.mood]));
   const averagePain = pains.length > 0 ? Math.round(mean(pains) * 10) / 10 : null;
   const frequentMood = mostFrequent(moods);
 
