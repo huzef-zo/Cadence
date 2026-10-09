@@ -1,0 +1,86 @@
+/* Cadence design tokens. Components never hardcode colors, spacing, radii or
+   font sizes; everything references these variables so the visual design can
+   be replaced centrally (spec section 3). */
+
+:root {
+  /* Light theme (default). */
+  --color-bg: #ffffff;
+  --color-surface: #f5f2f7;
+  --color-surface-raised: #ffffff;
+  --color-text: #221c28;
+  --color-text-muted: #5d5668;
+  --color-brand: #6b5b7a;
+  --color-brand-strong: #57496a;
+  --color-on-brand: #ffffff;
+  --color-period: #8a6a86;
+  --color-on-period: #ffffff;
+  --color-border: #d9d3df;
+  --color-danger: #9c3838;
+  --color-on-danger: #ffffff;
+  --color-focus: #275e9e;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Radius scale */
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 24px;
+  --radius-pill: 999px;
+
+  /* Type scale */
+  --font-size-xs: 0.75rem;
+  --font-size-s: 0.875rem;
+  --font-size-m: 1rem;
+  --font-size-l: 1.25rem;
+  --font-size-xl: 1.75rem;
+  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Sizing + effects */
+  --touch-target: 44px;
+  --shadow-2: 0 -4px 24px rgb(0 0 0 / 0.2);
+}
+
+/* Dark theme: follows the OS unless the user picks light/dark explicitly
+   (Settings writes data-theme on <html>; see App.tsx). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #17141b;
+    --color-surface: #211d27;
+    --color-surface-raised: #292430;
+    --color-text: #f1eef4;
+    --color-text-muted: #b3abc0;
+    --color-brand: #c3b2d6;
+    --color-brand-strong: #d9cde9;
+    --color-on-brand: #17141b;
+    --color-period: #b48caf;
+    --color-on-period: #17141b;
+    --color-border: #3c3646;
+    --color-danger: #e69090;
+    --color-on-danger: #17141b;
+    --color-focus: #8ab4f8;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #17141b;
+  --color-surface: #211d27;
+  --color-surface-raised: #292430;
+  --color-text: #f1eef4;
+  --color-text-muted: #b3abc0;
+  --color-brand: #c3b2d6;
+  --color-brand-strong: #d9cde9;
+  --color-on-brand: #17141b;
+  --color-period: #b48caf;
+  --color-on-period: #17141b;
+  --color-border: #3c3646;
+  --color-danger: #e69090;
+  --color-on-danger: #17141b;
+  --color-focus: #8ab4f8;
+}
