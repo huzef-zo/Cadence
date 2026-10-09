@@ -43,3 +43,4 @@ export const PBKDF2_SALT_BYTES = 16;
 // Export-backup reminder (spec 9)
 export const EXPORT_REMINDER_AFTER_PERIODS = 3;   // show once after this many periods
 export const EXPORT_REMINDER_INTERVAL_DAYS = 90;  // then re-show every N days
+export const BACKUP_SCHEMA_VERSION = 1;
