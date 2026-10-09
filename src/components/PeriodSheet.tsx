@@ -27,12 +27,12 @@ export function PeriodSheet({ onClose }: PeriodSheetProps) {
     setEnd(target !== null && target !== 'new' && target.endDate !== null ? target.endDate : '');
     setError(null);
   }
-
-  async function handleSave() {
+    async function handleSave() {
     if (start === '') return;
     const endDate = end === '' ? null : end;
     const ignoreId = editing !== null && editing !== 'new' ? editing.id : undefined;
-    const validation = await validatePeriod(start, endDate, db.periods.toArray(), ignoreId);
+    const existing = await db.periods.toArray();
+    const validation = validatePeriod(start, endDate, existing, ignoreId);
     if (validation === 'overlap') { setError(strings.errorPeriodOverlap); return; }
     if (validation === 'end-before-start') { setError(strings.errorEndBeforeStart); return; }
     if (editing === 'new') {
@@ -41,7 +41,7 @@ export function PeriodSheet({ onClose }: PeriodSheetProps) {
       await updatePeriod({ ...editing, startDate: start, endDate });
     }
     setEditing(null);
-  }
+    }
 
   async function handleDelete(period: Period) {
     // Delete confirmation (spec 4.1).
