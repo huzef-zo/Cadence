@@ -12,8 +12,14 @@ export function useLiveQuery<T>(querier: () => Promise<T> | T, deps: readonly un
       next: (result) => {
         if (alive) setValue(result);
       },
-      error: () => {
-        /* keep the last value */
+      error: async (err) => {
+        console.error('liveQuery error:', err);
+        try {
+          const fallback = await querier();
+          if (alive) setValue(fallback);
+        } catch (fallbackErr) {
+          console.error('liveQuery fallback error:', fallbackErr);
+        }
       },
     });
     return () => {

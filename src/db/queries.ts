@@ -9,26 +9,50 @@ function uuid(): string {
 // Returns the single settings row, creating defaults on first read. Missing
 // keys are filled from defaults for forward compatibility.
 export async function getSettings(): Promise<Settings> {
-  const existing = await db.settings.get('main');
-  if (existing) return { ...DEFAULT_SETTINGS, ...existing };
-  await db.settings.put(DEFAULT_SETTINGS);
-  return { ...DEFAULT_SETTINGS };
+  try {
+    const existing = await db.settings.get('main');
+    if (existing) return { ...DEFAULT_SETTINGS, ...existing };
+    await db.settings.put(DEFAULT_SETTINGS);
+    return { ...DEFAULT_SETTINGS };
+  } catch (err) {
+    console.error('Failed to access settings in IndexedDB:', err);
+    return { ...DEFAULT_SETTINGS };
+  }
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
-  await db.settings.put(settings);
+  try {
+    await db.settings.put(settings);
+  } catch (err) {
+    console.error('Failed to save settings to IndexedDB:', err);
+  }
 }
 
 export async function listPeriods(): Promise<Period[]> {
-  return db.periods.toArray();
+  try {
+    return await db.periods.toArray();
+  } catch (err) {
+    console.error('Failed to list periods from IndexedDB:', err);
+    return [];
+  }
 }
 
 export async function listEntries(): Promise<DayEntry[]> {
-  return db.entries.toArray();
+  try {
+    return await db.entries.toArray();
+  } catch (err) {
+    console.error('Failed to list entries from IndexedDB:', err);
+    return [];
+  }
 }
 
 export async function getEntry(date: string): Promise<DayEntry | undefined> {
-  return db.entries.get(date);
+  try {
+    return await db.entries.get(date);
+  } catch (err) {
+    console.error('Failed to get entry from IndexedDB:', err);
+    return undefined;
+  }
 }
 
 export async function saveEntry(date: string, data: Omit<DayEntry, 'date' | 'updatedAt'>): Promise<DayEntry> {
