@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useI18n } from '../i18n';
+import { ENABLED_LANGUAGES, LANGUAGE_NAMES, useI18n } from '../i18n';
 import { db } from '../db/db';
-import { createPeriod, getSettings } from '../db/queries';
+import { useLiveQuery } from '../db/hooks';
+import { createPeriod, getSettings, saveSettings } from '../db/queries';
+import type { Settings } from '../db/types';
 import { today } from '../logic/dates';
 import { validatePeriod } from '../logic/validation';
 
 export function Onboarding() {
   const { t } = useI18n();
+  const settings = useLiveQuery(() => getSettings(), []);
   const [step, setStep] = useState(0);
   const [lastStart, setLastStart] = useState('');
   const [cycleLength, setCycleLength] = useState('');
@@ -44,6 +47,28 @@ export function Onboarding() {
     <main className="screen onboarding">
       {step === 0 && (
         <section className="card">
+          {ENABLED_LANGUAGES.length > 1 && (
+            <div className="field">
+              <label className="field__label" htmlFor="ob-language">{t.languageLabel}</label>
+              <select
+                id="ob-language"
+                className="input"
+                value={settings?.language ?? 'system'}
+                onChange={async (event) => {
+                  const language = event.target.value as Settings['language'];
+                  const current = await getSettings();
+                  await saveSettings({ ...current, language });
+                }}
+              >
+                <option value="system">{t.languageSystem}</option>
+                {ENABLED_LANGUAGES.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {LANGUAGE_NAMES[lang]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <h1 className="screen__title">{t.onboardingStep1Title}</h1>
           <p>{t.onboardingStep1Body}</p>
         </section>

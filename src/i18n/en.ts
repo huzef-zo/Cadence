@@ -155,6 +155,9 @@ export const strings = {
   cardMoodFrequency: 'Most frequent mood',
 
   // Settings
+  sectionLanguage: 'Language',
+  languageLabel: 'Language',
+  languageSystem: 'System default',
   sectionPattern: 'Cycle pattern',
   overrideLabel: 'Overall pattern label',
   overrideAuto: 'Auto (calculated)',

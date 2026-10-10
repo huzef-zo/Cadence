@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useI18n } from '../i18n';
+import { ENABLED_LANGUAGES, LANGUAGE_NAMES, useI18n } from '../i18n';
 import { db } from '../db/db';
 import { useLiveQuery } from '../db/hooks';
 import { getSettings, saveSettings } from '../db/queries';
@@ -255,6 +255,30 @@ export function Settings() {
           </select>
         </div>
       </section>
+
+      {ENABLED_LANGUAGES.length > 1 && (
+        <section className="card" aria-label={t.sectionLanguage}>
+          <h2 className="card__heading">{t.sectionLanguage}</h2>
+          <div className="field">
+            <label className="field__label" htmlFor="language">{t.languageLabel}</label>
+            <select
+              id="language"
+              className="input"
+              value={settings.language}
+              onChange={(event) =>
+                patchSettings({ language: event.target.value as SettingsData['language'] })
+              }
+            >
+              <option value="system">{t.languageSystem}</option>
+              {ENABLED_LANGUAGES.map((lang) => (
+                <option key={lang} value={lang}>
+                  {LANGUAGE_NAMES[lang]}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+      )}
 
       <section className="card" aria-label={t.sectionData}>
         <h2 className="card__heading">{t.sectionData}</h2>
