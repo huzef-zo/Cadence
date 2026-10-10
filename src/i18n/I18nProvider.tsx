@@ -1,10 +1,21 @@
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { en, type Strings } from './en';
+import { am } from './am';
+import { ar } from './ar';
+import { dirFor, resolveLanguage, type Lang } from './languages';
+import { getSettings } from '../db/queries';
+import { useLiveQuery } from '../db/hooks';
 import { formatDayLong } from '../logic/dates';
 
-export type Lang = 'en';
+export type { Lang };
 export type Dir = 'ltr' | 'rtl';
+
+const dictionaries: Record<Lang, Strings> = {
+  en,
+  am,
+  ar,
+};
 
 export interface I18nContextValue {
   t: Strings;
@@ -18,8 +29,11 @@ export interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const lang: Lang = 'en';
-  const dir: Dir = 'ltr';
+  const settings = useLiveQuery(() => getSettings(), []);
+  const preferredLangs = typeof navigator !== 'undefined' && navigator.languages ? navigator.languages : [];
+  const lang = resolveLanguage(settings?.language ?? 'system', preferredLangs);
+  const dir = dirFor(lang);
+  const t = dictionaries[lang];
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -28,14 +42,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<I18nContextValue>(
     () => ({
-      t: en,
+      t,
       lang,
       dir,
       formatDay: (day: string) => formatDayLong(day),
       formatMonth: (date: Date) => format(date, 'MMMM yyyy'),
-      weekdayShort: en.weekdayShort,
+      weekdayShort: t.weekdayShort,
     }),
-    [lang, dir],
+    [t, lang, dir],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
