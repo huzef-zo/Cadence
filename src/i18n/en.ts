@@ -1,6 +1,10 @@
 // All user-facing text lives here (English only in V1, spec section 3).
 // Layouts use logical CSS properties so RTL languages can be added later.
 
+import { makePlural } from './plural';
+
+const plural = makePlural('en');
+
 export const strings = {
   appName: 'Cadence',
 
@@ -16,7 +20,7 @@ export const strings = {
 
   // Insights
   insightsSummary: (avg: number, min: number, max: number, count: number) =>
-    `Average cycle length: ${avg} days (range ${min}–${max}) across ${count} cycles.`,
+    `Average cycle length: ${avg} ${plural(avg, { one: 'day', other: 'days' })} (range ${min}–${max}) across ${count} ${plural(count, { one: 'cycle', other: 'cycles' })}.`,
   insightsKeepLogging: 'Keep logging to see this.',
   insightsHeadingCycleLengthTrend: 'Cycle length trend',
   insightsHeadingPeriodLengthTrend: 'Period length trend',
@@ -32,9 +36,9 @@ export const strings = {
   tableHeaderValue: 'Value',
   tableHeaderCount: 'Count',
   lineChartAriaLabel: (title: string, count: number, first: string | number, last: string | number) =>
-    `${title} chart with ${count} data points. First value is ${first}, last value is ${last}.`,
+    `${title} chart with ${count} ${plural(count, { one: 'data point', other: 'data points' })}. First value is ${first}, last value is ${last}.`,
   barListAriaLabel: (title: string, count: number) =>
-    `${title} horizontal bar list with ${count} items.`,
+    `${title} horizontal bar list with ${count} ${plural(count, { one: 'item', other: 'items' })}.`,
 
   // Generic
   save: 'Save',
@@ -81,7 +85,7 @@ export const strings = {
   patternNotEnoughData: 'Not enough data yet',
   patternExplanationTitle: 'How this was decided',
   patternExplanation: (min: number, max: number, variation: number, minCycles: number) =>
-    `This label describes your logged cycles. A cycle length between ${min} and ${max} days counts as within the typical range. If the difference between your shortest and longest recent cycles is ${variation} days or less, and all recent cycles are within that range, the pattern is called regular; otherwise irregular. Before ${minCycles} completed cycles, it says “Not enough data yet”. This is not a medical assessment.`,
+    `This label describes your logged cycles. A cycle length between ${min} and ${max} days counts as within the typical range. If the difference between your shortest and longest recent cycles is ${variation} ${plural(variation, { one: 'day', other: 'days' })} or less, and all recent cycles are within that range, the pattern is called regular; otherwise irregular. Before ${minCycles} completed ${plural(minCycles, { one: 'cycle', other: 'cycles' })}, it says “Not enough data yet”. This is not a medical assessment.`,
   actionPeriodStarted: 'Period started today',
   actionPeriodEnded: 'Period ended today',
   actionLogToday: 'Log today',
@@ -116,7 +120,6 @@ export const strings = {
   // Calendar
   calendarPrevMonth: 'Previous month',
   calendarNextMonth: 'Next month',
-  weekdayShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   legendPeriod: 'Period',
   legendPredicted: 'Predicted period days',
   legendLogged: 'Has a log entry',
@@ -139,7 +142,7 @@ export const strings = {
   moodTagsLabel: 'Mood tags',
   logNote: 'Note',
   logNotePlaceholder: 'Anything you want to remember about this day (optional)',
-  noteRemaining: (n: number) => `${n} characters left`,
+  noteRemaining: (n: number) => `${n} ${plural(n, { one: 'character', other: 'characters' })} left`,
   fieldNotSet: 'Not set',
 
   // History
@@ -148,7 +151,7 @@ export const strings = {
   summaryAvgCycleLength: 'Average cycle length',
   summaryAvgPeriodLength: 'Average period length',
   summaryCyclesLogged: 'Cycles logged',
-  days: (n: number) => `${n} days`,
+  days: (n: number) => `${n} ${plural(n, { one: 'day', other: 'days' })}`,
   cardPeriodLength: 'Period length',
   cardCycleLength: 'Cycle length',
   cardAvgPain: 'Average pain',
@@ -158,6 +161,12 @@ export const strings = {
   sectionLanguage: 'Language',
   languageLabel: 'Language',
   languageSystem: 'System default',
+  sectionCalendar: 'Calendar',
+  weekStartLabel: 'Week starts on',
+  weekStartDefault: 'Default for this language',
+  weekStartSunday: 'Sunday',
+  weekStartMonday: 'Monday',
+  weekStartSaturday: 'Saturday',
   sectionPattern: 'Cycle pattern',
   overrideLabel: 'Overall pattern label',
   overrideAuto: 'Auto (calculated)',
@@ -200,7 +209,8 @@ export const strings = {
   dataImportMerge: 'Merge with current data',
   dataImportReplace: 'Replace all current data',
   dataImportReplaceConfirm: 'Replace all data currently on this device with the backup?',
-  dataImportResult: (periods: number, entries: number) => `Imported ${periods} periods and ${entries} day entries.`,
+  dataImportResult: (periods: number, entries: number) =>
+    `Imported ${periods} ${plural(periods, { one: 'period', other: 'periods' })} and ${entries} ${plural(entries, { one: 'day entry', other: 'day entries' })}.`,
   dataDelete: 'Delete all data',
   dataDeleteWarning:
     'This permanently deletes every period, day entry, and setting on this device. This cannot be undone. Consider exporting a backup first.',

@@ -1,12 +1,18 @@
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
 import { en, type Strings } from './en';
 import { am } from './am';
 import { ar } from './ar';
 import { dirFor, resolveLanguage, type Lang } from './languages';
 import { getSettings } from '../db/queries';
 import { useLiveQuery } from '../db/hooks';
-import { formatDayLong } from '../logic/dates';
+import {
+  formatDayLong,
+  formatMonthYear,
+  localeTag,
+  resolveWeekStart,
+  weekdayLabels,
+} from './format';
+import { makePlural, type PluralFn } from './plural';
 
 export type { Lang };
 export type Dir = 'ltr' | 'rtl';
@@ -23,7 +29,9 @@ export interface I18nContextValue {
   dir: Dir;
   formatDay: (day: string) => string;
   formatMonth: (date: Date) => string;
+  weekStartsOn: 0 | 1 | 6;
   weekdayShort: readonly string[];
+  plural: PluralFn;
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -35,6 +43,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const dir = dirFor(lang);
   const t = dictionaries[lang];
 
+  const weekStartsOn = resolveWeekStart(settings?.weekStart ?? 'default', lang);
+  const weekdayShort = useMemo(() => weekdayLabels(lang, weekStartsOn), [lang, weekStartsOn]);
+  const plural = useMemo(() => makePlural(localeTag(lang)), [lang]);
+
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
@@ -45,11 +57,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       t,
       lang,
       dir,
-      formatDay: (day: string) => formatDayLong(day),
-      formatMonth: (date: Date) => format(date, 'MMMM yyyy'),
-      weekdayShort: t.weekdayShort,
+      formatDay: (day: string) => formatDayLong(lang, day),
+      formatMonth: (date: Date) => formatMonthYear(lang, date),
+      weekStartsOn,
+      weekdayShort,
+      plural,
     }),
-    [t, lang, dir],
+    [t, lang, dir, weekStartsOn, weekdayShort, plural],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

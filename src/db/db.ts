@@ -7,6 +7,7 @@ export const SCHEMA_VERSION = 1;
 export const DEFAULT_SETTINGS: Settings = {
   key: 'main',
   language: 'system',
+  weekStart: 'default',
   regularityOverride: 'auto',
   typicalCycleLength: null,
   typicalPeriodLength: null,

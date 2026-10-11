@@ -30,6 +30,7 @@ export interface ReminderSettings {
 export interface Settings {
   key: 'main';
   language: 'system' | 'en' | 'am' | 'ar';
+  weekStart: 'default' | 'sunday' | 'monday' | 'saturday';
   regularityOverride: 'auto' | 'regular' | 'irregular';
   typicalCycleLength: number | null;
   typicalPeriodLength: number | null;

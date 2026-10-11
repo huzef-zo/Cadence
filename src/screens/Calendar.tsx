@@ -32,7 +32,7 @@ function periodDaysFrom(periods: Period[], todayString: string): Set<string> {
 }
 
 export function Calendar() {
-  const { t, formatMonth, weekdayShort } = useI18n();
+  const { t, formatMonth, weekdayShort, weekStartsOn } = useI18n();
   const todayString = useToday();
   const [month, setMonth] = useState(() => startOfMonth(new Date()));
   const [selected, setSelected] = useState<string | null>(null);
@@ -56,8 +56,8 @@ export function Calendar() {
     }
 
     const loggedDays = new Set(entries.map((entry) => entry.date));
-    const gridStart = startOfWeek(startOfMonth(month));
-    const gridEnd = endOfWeek(endOfMonth(month));
+    const gridStart = startOfWeek(startOfMonth(month), { weekStartsOn });
+    const gridEnd = endOfWeek(endOfMonth(month), { weekStartsOn });
 
     return eachDayOfInterval({ start: gridStart, end: gridEnd }).map((date) => {
       const dayString = format(date, 'yyyy-MM-dd');
@@ -70,7 +70,7 @@ export function Calendar() {
         isToday: dayString === todayString,
       };
     });
-  }, [periods, entries, settings, month, todayString]);
+  }, [periods, entries, settings, month, todayString, weekStartsOn]);
 
   return (
     <main className="screen">

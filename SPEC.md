@@ -215,6 +215,7 @@ interface DayEntry {
 interface Settings {
   key: 'main';
   language: 'system' | 'en' | 'am' | 'ar'; // UI language
+  weekStart: 'default' | 'sunday' | 'monday' | 'saturday'; // first day of week in the calendar
   regularityOverride: 'auto' | 'regular' | 'irregular';
   typicalCycleLength: number | null;   // onboarding estimate
   typicalPeriodLength: number | null;
