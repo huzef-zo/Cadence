@@ -30,16 +30,24 @@ describe('i18n infrastructure and en locale', () => {
     }
   });
 
-  it('function-valued strings return expected formatted text', () => {
+  it('function-valued strings return expected formatted text and handles singular/plural', () => {
     expect(en.statusPeriodDay(3)).toBe('Period day 3');
     expect(en.statusCycleDay(14)).toBe('Day 14 of your cycle');
+    expect(en.days(1)).toBe('1 day');
+    expect(en.days(2)).toBe('2 days');
     expect(en.days(3)).toBe('3 days');
     expect(en.painValue(7)).toBe('7 of 10');
+    expect(en.noteRemaining(1)).toBe('1 character left');
     expect(en.noteRemaining(100)).toBe('100 characters left');
     expect(en.predictionRange('2025-01-01', '2025-01-05')).toBe('Next period: around 2025-01-01 to 2025-01-05');
+    expect(en.insightsSummary(28, 25, 32, 1)).toBe(
+      'Average cycle length: 28 days (range 25–32) across 1 cycle.',
+    );
     expect(en.insightsSummary(28, 25, 32, 6)).toBe(
       'Average cycle length: 28 days (range 25–32) across 6 cycles.',
     );
+    expect(en.dataImportResult(1, 1)).toBe('Imported 1 period and 1 day entry.');
+    expect(en.dataImportResult(2, 3)).toBe('Imported 2 periods and 3 day entries.');
     expect(en.logTitle('January 1, 2025')).toBe('Log for January 1, 2025');
   });
 });

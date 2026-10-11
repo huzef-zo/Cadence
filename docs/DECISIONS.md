@@ -22,9 +22,11 @@
 - **Icons are SVG.** This text-only repo cannot carry binary PNGs; SVG icons
   with `sizes: "any"` satisfy installability in current browsers.
   TODO(spec): generate 192/512 PNG icons for the manifest.
-- **Calendar week starts on Sunday** (date-fns default).
-  TODO(spec): confirm whether a Monday start is wanted.
 - **Manual pattern override** replaces only the displayed label; predictions
   always use the computed values (spec 4.3).
 - **`ENABLED_LANGUAGES` build flag.** Languages other than English are gated behind `import.meta.env.VITE_ENABLE_ALL_LANGS === 'true'` at build time so unreviewed draft translations do not reach users in standard production builds.
 - **Language names in native scripts.** Language display names (`LANGUAGE_NAMES`) are always presented in their own script (e.g., English, አማርኛ, العربية) and never translated, ensuring users can recognize their language regardless of the active UI locale.
+- **Intl for display and date-fns for math.** `Intl.DateTimeFormat` is used for display formatting while `date-fns` remains strictly for date math and manipulation.
+- **Gregorian calendar and Latin digits forced in all display locales.** All `Intl.DateTimeFormat` display formatters append `-u-ca-gregory-nu-latn` so dates are displayed using the Gregorian calendar and Latin digits regardless of active UI language.
+- **Week start per language and user setting.** The calendar week start defaults per language (Saturday for Arabic, Sunday for English and Amharic) and is user-configurable in Settings (`weekStart`).
+- **Plural-sensitive strings use `Intl.PluralRules`.** Plural-sensitive user interface strings use `Intl.PluralRules` to select grammatical forms across supported locales.

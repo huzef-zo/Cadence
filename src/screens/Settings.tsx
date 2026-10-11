@@ -280,6 +280,26 @@ export function Settings() {
         </section>
       )}
 
+      <section className="card" aria-label={t.sectionCalendar}>
+        <h2 className="card__heading">{t.sectionCalendar}</h2>
+        <div className="field">
+          <label className="field__label" htmlFor="week-start">{t.weekStartLabel}</label>
+          <select
+            id="week-start"
+            className="input"
+            value={settings.weekStart ?? 'default'}
+            onChange={(event) =>
+              patchSettings({ weekStart: event.target.value as SettingsData['weekStart'] })
+            }
+          >
+            <option value="default">{t.weekStartDefault}</option>
+            <option value="sunday">{t.weekStartSunday}</option>
+            <option value="monday">{t.weekStartMonday}</option>
+            <option value="saturday">{t.weekStartSaturday}</option>
+          </select>
+        </div>
+      </section>
+
       <section className="card" aria-label={t.sectionData}>
         <h2 className="card__heading">{t.sectionData}</h2>
         <div className="actions">

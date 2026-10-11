@@ -25,7 +25,3 @@ export function addDaysToDay(day: string, amount: number): string {
 export function diffDays(to: string, from: string): number {
   return differenceInCalendarDays(parseISO(to), parseISO(from));
 }
-
-export function formatDayLong(day: string): string {
-  return format(parseISO(day), 'MMMM d, yyyy');
-}
